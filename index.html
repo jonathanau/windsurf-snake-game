@@ -36,10 +36,18 @@
             margin: 20px auto;
         }
         
+        .score-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+            max-width: 400px;
+        }
+        
         .score {
             color: #00ff00;
             font-size: 20px;
-            margin: 10px 0;
+            margin: 0;
         }
         
         .controls {
@@ -80,8 +88,10 @@
 <body>
     <div class="game-container">
         <h1>🐍 Snake Game</h1>
-        <div class="score">Score: <span id="score">0</span></div>
-        <div class="score">High Score: <span id="highScore">0</span></div>
+        <div class="score-container">
+            <div class="score">Score: <span id="score">0</span></div>
+            <div class="score">High Score: <span id="highScore">0</span></div>
+        </div>
         <canvas id="gameCanvas" width="400" height="400"></canvas>
         <div class="game-over" id="gameOver">
             Game Over!<br>
