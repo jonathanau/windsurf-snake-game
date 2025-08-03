@@ -42,6 +42,8 @@ let dy = 0;
 let nextDx = 0;
 let nextDy = 0;
 let pendingDirectionChange = false;
+// Prevent multiple direction changes per movement frame
+let directionChangedThisFrame = false;
 let score = 0;
 // Get high score from localStorage with validation
 let highScore = 0;
@@ -276,6 +278,9 @@ function moveSnake() {
         pendingDirectionChange = false;
     }
     
+    // Reset direction change flag for this movement frame
+    directionChangedThisFrame = false;
+    
     const head = {x: snake[0].x + dx, y: snake[0].y + dy};
     
     // Add new head
@@ -503,10 +508,12 @@ function setupSwipeControls() {
         }
         
         // If game is running, set next direction for immediate feedback
-        if (gameRunning && isValidSwipe) {
+        // But only allow one direction change per movement frame to prevent U-turns
+        if (gameRunning && isValidSwipe && !directionChangedThisFrame) {
             nextDx = newDx;
             nextDy = newDy;
             pendingDirectionChange = true;
+            directionChangedThisFrame = true;
             // Trigger immediate re-render to show direction change feedback
             drawGame();
         }
@@ -637,10 +644,12 @@ document.addEventListener('keydown', (e) => {
     }
     
     // If game is running, set next direction for immediate feedback
-    if (gameRunning && isDirectionalInput) {
+    // But only allow one direction change per movement frame to prevent U-turns
+    if (gameRunning && isDirectionalInput && !directionChangedThisFrame) {
         nextDx = newDx;
         nextDy = newDy;
         pendingDirectionChange = true;
+        directionChangedThisFrame = true;
         // Trigger immediate re-render to show direction change feedback
         drawGame();
     }
