@@ -38,6 +38,10 @@ let foodMoveCounter = 0;
 const foodMoveInterval = 3; // Apple moves every 3 frames (snake moves every 1 frame)
 let dx = 0;
 let dy = 0;
+// Next direction for immediate visual feedback
+let nextDx = 0;
+let nextDy = 0;
+let pendingDirectionChange = false;
 let score = 0;
 // Get high score from localStorage with validation
 let highScore = 0;
@@ -222,8 +226,31 @@ function drawGame() {
     
     // Draw snake
     ctx.fillStyle = '#00ff00';
-    for (let segment of snake) {
+    for (let i = 0; i < snake.length; i++) {
+        const segment = snake[i];
         ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize - 2, gridSize - 2);
+        
+        // Add visual feedback for pending direction change on the head
+        if (i === 0 && pendingDirectionChange) {
+            // Draw a subtle direction indicator on the snake head
+            ctx.fillStyle = '#88ff88'; // Lighter green for feedback
+            const centerX = segment.x * gridSize + gridSize / 2;
+            const centerY = segment.y * gridSize + gridSize / 2;
+            const indicatorSize = 4;
+            
+            // Draw arrow indicator based on next direction
+            if (nextDx === 1) { // Right
+                ctx.fillRect(centerX + 4, centerY - 2, indicatorSize, indicatorSize);
+            } else if (nextDx === -1) { // Left
+                ctx.fillRect(centerX - 8, centerY - 2, indicatorSize, indicatorSize);
+            } else if (nextDy === -1) { // Up
+                ctx.fillRect(centerX - 2, centerY - 8, indicatorSize, indicatorSize);
+            } else if (nextDy === 1) { // Down
+                ctx.fillRect(centerX - 2, centerY + 4, indicatorSize, indicatorSize);
+            }
+            
+            ctx.fillStyle = '#00ff00'; // Reset to normal green
+        }
     }
     
     // Draw food (apple emoji)
@@ -242,6 +269,13 @@ function drawGame() {
 
 // Move snake
 function moveSnake() {
+    // Apply pending direction change if there is one
+    if (pendingDirectionChange) {
+        dx = nextDx;
+        dy = nextDy;
+        pendingDirectionChange = false;
+    }
+    
     const head = {x: snake[0].x + dx, y: snake[0].y + dy};
     
     // Add new head
@@ -468,10 +502,13 @@ function setupSwipeControls() {
             return;
         }
         
-        // If game is running, apply the direction change
+        // If game is running, set next direction for immediate feedback
         if (gameRunning && isValidSwipe) {
-            dx = newDx;
-            dy = newDy;
+            nextDx = newDx;
+            nextDy = newDy;
+            pendingDirectionChange = true;
+            // Trigger immediate re-render to show direction change feedback
+            drawGame();
         }
     }
     
@@ -599,10 +636,13 @@ document.addEventListener('keydown', (e) => {
         return;
     }
     
-    // If game is running, apply the direction change
+    // If game is running, set next direction for immediate feedback
     if (gameRunning && isDirectionalInput) {
-        dx = newDx;
-        dy = newDy;
+        nextDx = newDx;
+        nextDy = newDy;
+        pendingDirectionChange = true;
+        // Trigger immediate re-render to show direction change feedback
+        drawGame();
     }
 });
 
