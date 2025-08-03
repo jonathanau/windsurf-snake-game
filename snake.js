@@ -357,8 +357,11 @@ function startGame() {
     if (!gameRunning) {
         // Reset game state
         snake = [{x: 10, y: 10}];
-        dx = 0;
-        dy = 0;
+        // Only reset direction if no direction is already set (preserve directional input start)
+        if (dx === 0 && dy === 0) {
+            dx = 0;
+            dy = 0;
+        }
         score = 0;
         scoreElement.textContent = score;
         gameOverElement.style.display = 'none';
@@ -409,8 +412,6 @@ function setupSwipeControls() {
     let isSwiping = false;
     
     function handleSwipe(touchEndX, touchEndY) {
-        if (!gameRunning || gamePaused) return;
-        
         const dxSwipe = touchEndX - touchStartX;
         const dySwipe = touchEndY - touchStartY;
         
@@ -420,29 +421,57 @@ function setupSwipeControls() {
             return;
         }
         
+        // Determine new direction based on swipe
+        let newDx = dx;
+        let newDy = dy;
+        let isValidSwipe = false;
+        
         // Determine if the swipe was more horizontal or vertical
         if (Math.abs(dxSwipe) > Math.abs(dySwipe)) {
             // Horizontal swipe
             if (dxSwipe > 0 && dx !== -1) {
                 // Swipe right
-                dx = 1;
-                dy = 0;
+                newDx = 1;
+                newDy = 0;
+                isValidSwipe = true;
             } else if (dxSwipe < 0 && dx !== 1) {
                 // Swipe left
-                dx = -1;
-                dy = 0;
+                newDx = -1;
+                newDy = 0;
+                isValidSwipe = true;
             }
         } else {
             // Vertical swipe
             if (dySwipe > 0 && dy !== -1) {
                 // Swipe down
-                dx = 0;
-                dy = 1;
+                newDx = 0;
+                newDy = 1;
+                isValidSwipe = true;
             } else if (dySwipe < 0 && dy !== 1) {
                 // Swipe up
-                dx = 0;
-                dy = -1;
+                newDx = 0;
+                newDy = -1;
+                isValidSwipe = true;
             }
+        }
+        
+        // If game is not running and we got a valid swipe, start the game
+        if (!gameRunning && isValidSwipe) {
+            dx = newDx;
+            dy = newDy;
+            startGame();
+            return;
+        }
+        
+        // If game is paused, ignore swipes
+        if (gamePaused) {
+            return;
+        }
+        
+        // If game is running, apply the direction change
+        if (gameRunning && isValidSwipe) {
+            dx = newDx;
+            dy = newDy;
         }
     }
     
@@ -507,52 +536,73 @@ document.addEventListener('keydown', (e) => {
         e.preventDefault();
     }
     
-    if (!gameRunning || gamePaused) {
-        // Only allow space to unpause
-        if (e.code === 'Space' && !gameRunning) {
-            startGame();
-        } else if (e.code === 'Space' && gamePaused) {
-            pauseGame();
-        }
-        return;
-    }
-    
     const key = e.key.toLowerCase();
     
-    // Prevent reverse direction
+    // Handle directional inputs
+    let newDx = dx;
+    let newDy = dy;
+    let isDirectionalInput = false;
+    
     switch (key) {
         case 'arrowup':
         case 'w':
             if (dy !== 1) {
-                dx = 0;
-                dy = -1;
+                newDx = 0;
+                newDy = -1;
+                isDirectionalInput = true;
             }
             break;
         case 'arrowdown':
         case 's':
             if (dy !== -1) {
-                dx = 0;
-                dy = 1;
+                newDx = 0;
+                newDy = 1;
+                isDirectionalInput = true;
             }
             break;
         case 'arrowleft':
         case 'a':
             if (dx !== 1) {
-                dx = -1;
-                dy = 0;
+                newDx = -1;
+                newDy = 0;
+                isDirectionalInput = true;
             }
             break;
         case 'arrowright':
         case 'd':
             if (dx !== -1) {
-                dx = 1;
-                dy = 0;
+                newDx = 1;
+                newDy = 0;
+                isDirectionalInput = true;
             }
             break;
         case ' ':
         case 'p':
-            pauseGame();
-            break;
+            if (gameRunning) {
+                pauseGame();
+            } else {
+                startGame();
+            }
+            return;
+    }
+    
+    // If game is not running and we got a directional input, start the game
+    if (!gameRunning && isDirectionalInput) {
+        dx = newDx;
+        dy = newDy;
+        startGame();
+        return;
+    }
+    
+    // If game is paused, only allow space to unpause
+    if (gamePaused) {
+        return;
+    }
+    
+    // If game is running, apply the direction change
+    if (gameRunning && isDirectionalInput) {
+        dx = newDx;
+        dy = newDy;
     }
 });
 
