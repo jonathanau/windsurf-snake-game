@@ -39,7 +39,8 @@
         
         .score-container {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
+            gap: 40px;
             align-items: center;
             margin: 15px 0;
             max-width: 400px;
@@ -84,6 +85,11 @@
         button:active {
             background-color: #009900;
         }
+        
+        /* Make canvas touch-friendly on mobile */
+        #gameCanvas {
+            touch-action: none; /* Disable browser touch actions like scrolling */
+        }
     </style>
 </head>
 <body>
@@ -99,10 +105,12 @@
             <button onclick="restartGame()">Play Again</button>
         </div>
         <div class="controls">
-            <p>Use arrow keys or WASD to control the snake</p>
+            <p>Use swipe gestures, arrow keys, or WASD to control the snake.</p>
             <button onclick="startGame()">Start Game</button>
             <button onclick="pauseGame()">Pause</button>
         </div>
+        
+        <!-- Canvas will be used for swipe gestures -->
     </div>
     
     <script src="snake.js"></script>

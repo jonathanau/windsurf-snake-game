@@ -400,6 +400,106 @@ function isValidKey(key) {
     return validKeys.includes(key);
 }
 
+// Swipe controls for the game canvas
+function setupSwipeControls() {
+    // Use the game canvas for swipe gestures
+    const gameCanvas = document.getElementById('gameCanvas');
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isSwiping = false;
+    
+    function handleSwipe(touchEndX, touchEndY) {
+        if (!gameRunning || gamePaused) return;
+        
+        const dxSwipe = touchEndX - touchStartX;
+        const dySwipe = touchEndY - touchStartY;
+        
+        // Only process swipes that move a minimum distance (to prevent accidental swipes)
+        const minSwipeDistance = 10;
+        if (Math.abs(dxSwipe) < minSwipeDistance && Math.abs(dySwipe) < minSwipeDistance) {
+            return;
+        }
+        
+        // Determine if the swipe was more horizontal or vertical
+        if (Math.abs(dxSwipe) > Math.abs(dySwipe)) {
+            // Horizontal swipe
+            if (dxSwipe > 0 && dx !== -1) {
+                // Swipe right
+                dx = 1;
+                dy = 0;
+            } else if (dxSwipe < 0 && dx !== 1) {
+                // Swipe left
+                dx = -1;
+                dy = 0;
+            }
+        } else {
+            // Vertical swipe
+            if (dySwipe > 0 && dy !== -1) {
+                // Swipe down
+                dx = 0;
+                dy = 1;
+            } else if (dySwipe < 0 && dy !== 1) {
+                // Swipe up
+                dx = 0;
+                dy = -1;
+            }
+        }
+    }
+    
+    // Touch event handlers
+    gameCanvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const rect = gameCanvas.getBoundingClientRect();
+        touchStartX = touch.clientX - rect.left;
+        touchStartY = touch.clientY - rect.top;
+        isSwiping = true;
+    }, { passive: false });
+    
+    gameCanvas.addEventListener('touchmove', (e) => {
+        if (!isSwiping) return;
+        e.preventDefault();
+    }, { passive: false });
+    
+    gameCanvas.addEventListener('touchend', (e) => {
+        if (!isSwiping) return;
+        e.preventDefault();
+        const touch = e.changedTouches[0];
+        const rect = gameCanvas.getBoundingClientRect();
+        const touchEndX = touch.clientX - rect.left;
+        const touchEndY = touch.clientY - rect.top;
+        handleSwipe(touchEndX, touchEndY);
+        isSwiping = false;
+    }, { passive: false });
+    
+    // Mouse event handlers for testing on desktop
+    gameCanvas.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        const rect = gameCanvas.getBoundingClientRect();
+        touchStartX = e.clientX - rect.left;
+        touchStartY = e.clientY - rect.top;
+        isSwiping = true;
+    });
+    
+    gameCanvas.addEventListener('mouseup', (e) => {
+        if (!isSwiping) return;
+        e.preventDefault();
+        const rect = gameCanvas.getBoundingClientRect();
+        const touchEndX = e.clientX - rect.left;
+        const touchEndY = e.clientY - rect.top;
+        handleSwipe(touchEndX, touchEndY);
+        isSwiping = false;
+    });
+    
+    // Prevent context menu on right-click
+    gameCanvas.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+    });
+}
+
+// Initialize swipe controls when the DOM is loaded
+document.addEventListener('DOMContentLoaded', setupSwipeControls);
+
 // Keyboard controls
 document.addEventListener('keydown', (e) => {
     // Prevent default for game keys to avoid page scrolling
