@@ -25,6 +25,9 @@ const gameOverElement = document.getElementById('gameOver');
 // Game settings
 const gridSize = 20;
 const tileCount = canvas.width / gridSize;
+const moveInterval = 400; // Time in milliseconds between snake movements (400ms = 0.4 seconds)
+let lastMoveTime = 0;
+let lastRenderTime = 0;
 
 let snake = [
     {x: 10, y: 10}
@@ -297,20 +300,52 @@ function gameOver() {
 }
 
 // Main game loop
-function gameLoop() {
-    if (!gameRunning || gamePaused) {
-        return;
+function gameLoop(timestamp) {
+    try {
+        // Always update animations (explosions, etc.)
+        updateExplosions();
+        
+        // Only move the snake at the specified interval
+        if (timestamp - lastMoveTime >= moveInterval) {
+            if (gameRunning && !gamePaused) {
+                moveSnake();
+                moveFood(); // Move the apple
+                
+                if (checkCollision()) {
+                    gameOver();
+                    return;
+                }
+            }
+            lastMoveTime = timestamp;
+        }
+        
+        // Always render the current game state
+        if (gameRunning && !gamePaused) {
+            drawGame();
+        }
+        
+    } catch (error) {
+        console.error('Game loop error:', error);
+        // Try to recover by resetting the game state
+        try {
+            gameOver();
+            alert('A game error occurred. The game has been reset.');
+        } catch (e) {
+            console.error('Error during game recovery:', e);
+            // If we can't recover, show an error message
+            document.body.innerHTML = `
+                <div style="color: red; text-align: center; padding: 20px;">
+                    <h2>Game Error</h2>
+                    <p>Sorry, the game encountered an error and cannot continue.</p>
+                    <p>Please refresh the page to try again.</p>
+                </div>
+            `;
+            return; // Stop the game loop
+        }
     }
     
-    moveSnake();
-    moveFood(); // Move the apple
-    
-    if (checkCollision()) {
-        gameOver();
-        return;
-    }
-    
-    drawGame();
+    // Always request the next frame
+    requestAnimationFrame(gameLoop);
 }
 
 // Start game
@@ -334,8 +369,10 @@ function startGame() {
     gameRunning = true;
     gamePaused = false;
     
-    // Start game loop
-    setInterval(gameLoop, 100);
+    // Start the game loop with requestAnimationFrame
+    lastRenderTime = performance.now();
+    lastMoveTime = lastRenderTime;
+    requestAnimationFrame(gameLoop);
 }
 
 // Pause game
