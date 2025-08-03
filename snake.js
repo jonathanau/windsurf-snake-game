@@ -1,6 +1,23 @@
 // Game variables
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+let canvas, ctx;
+try {
+    canvas = document.getElementById('gameCanvas');
+    if (!canvas) throw new Error('Game canvas not found');
+    
+    ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Could not get 2D rendering context');
+} catch (error) {
+    console.error('Canvas initialization error:', error);
+    // Show error to user
+    const errorDiv = document.createElement('div');
+    errorDiv.style.color = 'red';
+    errorDiv.style.padding = '20px';
+    errorDiv.style.textAlign = 'center';
+    errorDiv.textContent = 'Error initializing game. Please refresh the page or check your browser compatibility.';
+    document.body.innerHTML = '';
+    document.body.appendChild(errorDiv);
+    throw error; // Stop further execution
+}
 const scoreElement = document.getElementById('score');
 const highScoreElement = document.getElementById('highScore');
 const gameOverElement = document.getElementById('gameOver');
@@ -19,7 +36,20 @@ const foodMoveInterval = 3; // Apple moves every 3 frames (snake moves every 1 f
 let dx = 0;
 let dy = 0;
 let score = 0;
-let highScore = localStorage.getItem('snakeHighScore') || 0;
+// Get high score from localStorage with validation
+let highScore = 0;
+try {
+    const storedScore = localStorage.getItem('snakeHighScore');
+    if (storedScore) {
+        const parsedScore = parseInt(storedScore, 10);
+        // Validate the score is a positive number and not too large (prevent potential memory issues)
+        if (!isNaN(parsedScore) && parsedScore >= 0 && parsedScore <= 1000000) {
+            highScore = parsedScore;
+        }
+    }
+} catch (e) {
+    console.warn('Failed to load high score:', e);
+}
 let gameRunning = false;
 let gamePaused = false;
 
@@ -251,11 +281,18 @@ function gameOver() {
     gameRunning = false;
     gameOverElement.style.display = 'block';
     
-    // Update high score
+    // Update high score with validation
     if (score > highScore) {
-        highScore = score;
-        highScoreElement.textContent = highScore;
-        localStorage.setItem('snakeHighScore', highScore);
+        // Only update high score if the new score is higher and valid
+        if (score <= 1000000) {  // Prevent extremely large scores
+            highScore = score;
+            highScoreElement.textContent = highScore;
+            try {
+                localStorage.setItem('snakeHighScore', highScore.toString());
+            } catch (e) {
+                console.warn('Failed to save high score:', e);
+            }
+        }
     }
 }
 
@@ -316,9 +353,30 @@ function restartGame() {
     startGame();
 }
 
+// Validate keyboard input
+function isValidKey(key) {
+    // Only allow arrow keys, WASD, and space for pause
+    const validKeys = [
+        'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+        'w', 'a', 's', 'd', 'W', 'A', 'S', 'D', ' '
+    ];
+    return validKeys.includes(key);
+}
+
 // Keyboard controls
 document.addEventListener('keydown', (e) => {
+    // Prevent default for game keys to avoid page scrolling
+    if (isValidKey(e.key)) {
+        e.preventDefault();
+    }
+    
     if (!gameRunning || gamePaused) {
+        // Only allow space to unpause
+        if (e.code === 'Space' && !gameRunning) {
+            startGame();
+        } else if (e.code === 'Space' && gamePaused) {
+            pauseGame();
+        }
         return;
     }
     

@@ -92,9 +92,30 @@ snake-game/
 └── README.md          # This file
 ```
 
+## Security
+
+This game implements several security best practices:
+
+- **Content Security Policy (CSP)**: Implements a strict CSP to prevent XSS attacks
+- **Input Validation**: All user inputs are validated before processing
+- **Secure Storage**: High scores are stored with validation and sanitization
+- **Error Handling**: Comprehensive error handling for all critical operations
+
+### Reporting Security Issues
+
+If you discover any security vulnerabilities, please report them to the repository maintainers.
+
 ## Development
 
 The game is built with vanilla JavaScript and HTML5 Canvas for optimal performance and compatibility.
+
+### Production Deployment
+
+For production deployments, consider:
+- Minifying and obfuscating the JavaScript code
+- Serving the game over HTTPS
+- Using security headers like `X-Content-Type-Options: nosniff`
+- Setting appropriate CORS headers if needed
 
 ### Running Tests
 
