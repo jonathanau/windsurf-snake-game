@@ -39,17 +39,26 @@
         
         .score-container {
             display: flex;
-            justify-content: center;
-            gap: 40px;
-            align-items: center;
-            margin: 15px 0;
+            justify-content: space-between;
+            width: 100%;
             max-width: 400px;
+            margin: 15px auto;
+            padding: 0 20px;
+            box-sizing: border-box;
         }
         
         .score {
             color: #00ff00;
             font-size: 20px;
             margin: 0;
+        }
+        
+        #score {
+            text-align: left;
+        }
+        
+        #highScore {
+            text-align: right;
         }
         
         .controls {
@@ -97,7 +106,7 @@
         <h1>🐍 Snake Game</h1>
         <div class="score-container">
             <div class="score">Score: <span id="score">0</span></div>
-            <div class="score">High Score: <span id="highScore">0</span></div>
+            <div class="score">Personal Best: <span id="highScore">0</span></div>
         </div>
         <canvas id="gameCanvas" width="360" height="360"></canvas>
         <div class="game-over" id="gameOver">
