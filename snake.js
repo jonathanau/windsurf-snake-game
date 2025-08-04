@@ -429,6 +429,13 @@ function restartGame() {
     gameRunning = false;
     gamePaused = false;
     gameOverElement.style.display = 'none';
+    // Reset all direction variables to ensure snake doesn't move automatically
+    dx = 0;
+    dy = 0;
+    nextDx = 0;
+    nextDy = 0;
+    pendingDirectionChange = false;
+    directionChangedThisFrame = false;
     startGame();
 }
 
