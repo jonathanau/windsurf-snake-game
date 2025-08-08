@@ -664,6 +664,7 @@ document.addEventListener('keydown', (e) => {
                 newDx = 0;
                 newDy = -1;
                 isDirectionalInput = true;
+                triggerEdgeFlash('up');
             }
             break;
         case 'arrowdown':
@@ -672,6 +673,7 @@ document.addEventListener('keydown', (e) => {
                 newDx = 0;
                 newDy = 1;
                 isDirectionalInput = true;
+                triggerEdgeFlash('down');
             }
             break;
         case 'arrowleft':
@@ -680,6 +682,7 @@ document.addEventListener('keydown', (e) => {
                 newDx = -1;
                 newDy = 0;
                 isDirectionalInput = true;
+                triggerEdgeFlash('left');
             }
             break;
         case 'arrowright':
@@ -688,6 +691,7 @@ document.addEventListener('keydown', (e) => {
                 newDx = 1;
                 newDy = 0;
                 isDirectionalInput = true;
+                triggerEdgeFlash('right');
             }
             break;
         case ' ':
@@ -756,10 +760,12 @@ canvas.addEventListener('touchend', (e) => {
                 // Swipe right
                 dx = 1;
                 dy = 0;
+                triggerEdgeFlash('right');
             } else if (deltaX < 0 && dx !== 1) {
                 // Swipe left
                 dx = -1;
                 dy = 0;
+                triggerEdgeFlash('left');
             }
         }
     } else {
@@ -769,10 +775,12 @@ canvas.addEventListener('touchend', (e) => {
                 // Swipe down
                 dx = 0;
                 dy = 1;
+                triggerEdgeFlash('down');
             } else if (deltaY < 0 && dy !== 1) {
                 // Swipe up
                 dx = 0;
                 dy = -1;
+                triggerEdgeFlash('up');
             }
         }
     }
