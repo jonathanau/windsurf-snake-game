@@ -80,6 +80,15 @@ let currentBackgroundIndex = 0;
 // Explosion particles system
 let explosionParticles = [];
 
+// Edge flash system for swipe feedback
+let edgeFlash = {
+    active: false,
+    direction: null, // 'up', 'down', 'left', 'right'
+    duration: 200, // Flash duration in milliseconds
+    startTime: 0,
+    color: '#00ff88' // Bright green complementary color
+};
+
 class Particle {
     constructor(x, y) {
         this.x = x;
@@ -197,13 +206,60 @@ function changeBackground() {
 
 // Create explosion at given position
 function createExplosion(gridX, gridY) {
-    const centerX = gridX * gridSize + gridSize / 2;
-    const centerY = gridY * gridSize + gridSize / 2;
+    const canvasX = gridX * gridSize + gridSize / 2;
+    const canvasY = gridY * gridSize + gridSize / 2;
     
-    // Create multiple particles
-    for (let i = 0; i < 12; i++) {
-        explosionParticles.push(new Particle(centerX, centerY));
+    for (let i = 0; i < 15; i++) {
+        explosionParticles.push(new Particle(canvasX, canvasY));
     }
+}
+
+// Trigger edge flash for swipe feedback
+function triggerEdgeFlash(direction) {
+    edgeFlash.active = true;
+    edgeFlash.direction = direction;
+    edgeFlash.startTime = performance.now();
+}
+
+// Draw edge flash effect
+function drawEdgeFlash() {
+    if (!edgeFlash.active) return;
+    
+    const currentTime = performance.now();
+    const elapsed = currentTime - edgeFlash.startTime;
+    
+    // Check if flash should end
+    if (elapsed >= edgeFlash.duration) {
+        edgeFlash.active = false;
+        return;
+    }
+    
+    // Calculate flash intensity (fade out over time)
+    const intensity = 1 - (elapsed / edgeFlash.duration);
+    const alpha = Math.max(0, intensity * 0.8); // Max 80% opacity
+    
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = edgeFlash.color;
+    
+    const flashWidth = 8; // Width of the flash edge
+    
+    switch (edgeFlash.direction) {
+        case 'up':
+            ctx.fillRect(0, 0, canvas.width, flashWidth);
+            break;
+        case 'down':
+            ctx.fillRect(0, canvas.height - flashWidth, canvas.width, flashWidth);
+            break;
+        case 'left':
+            ctx.fillRect(0, 0, flashWidth, canvas.height);
+            break;
+        case 'right':
+            ctx.fillRect(canvas.width - flashWidth, 0, flashWidth, canvas.height);
+            break;
+    }
+    
+    ctx.restore();
 }
 
 // Update and draw explosion particles
@@ -267,6 +323,9 @@ function drawGame() {
     
     // Draw explosion particles
     updateExplosions();
+    
+    // Draw edge flash effect
+    drawEdgeFlash();
 }
 
 // Move snake
@@ -480,11 +539,13 @@ function setupSwipeControls() {
                 newDx = 1;
                 newDy = 0;
                 isValidSwipe = true;
+                triggerEdgeFlash('right');
             } else if (dxSwipe < 0 && dx !== 1) {
                 // Swipe left
                 newDx = -1;
                 newDy = 0;
                 isValidSwipe = true;
+                triggerEdgeFlash('left');
             }
         } else {
             // Vertical swipe
@@ -493,11 +554,13 @@ function setupSwipeControls() {
                 newDx = 0;
                 newDy = 1;
                 isValidSwipe = true;
+                triggerEdgeFlash('down');
             } else if (dySwipe < 0 && dy !== 1) {
                 // Swipe up
                 newDx = 0;
                 newDy = -1;
                 isValidSwipe = true;
+                triggerEdgeFlash('up');
             }
         }
         
