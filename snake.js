@@ -530,6 +530,7 @@ function setupSwipeControls() {
         let newDx = dx;
         let newDy = dy;
         let isValidSwipe = false;
+        let inputDirection = null;
         
         // Determine if the swipe was more horizontal or vertical
         if (Math.abs(dxSwipe) > Math.abs(dySwipe)) {
@@ -539,13 +540,13 @@ function setupSwipeControls() {
                 newDx = 1;
                 newDy = 0;
                 isValidSwipe = true;
-                triggerEdgeFlash('right');
+                inputDirection = 'right';
             } else if (dxSwipe < 0 && dx !== 1) {
                 // Swipe left
                 newDx = -1;
                 newDy = 0;
                 isValidSwipe = true;
-                triggerEdgeFlash('left');
+                inputDirection = 'left';
             }
         } else {
             // Vertical swipe
@@ -554,13 +555,13 @@ function setupSwipeControls() {
                 newDx = 0;
                 newDy = 1;
                 isValidSwipe = true;
-                triggerEdgeFlash('down');
+                inputDirection = 'down';
             } else if (dySwipe < 0 && dy !== 1) {
                 // Swipe up
                 newDx = 0;
                 newDy = -1;
                 isValidSwipe = true;
-                triggerEdgeFlash('up');
+                inputDirection = 'up';
             }
         }
         
@@ -568,6 +569,9 @@ function setupSwipeControls() {
         if (!gameRunning && isValidSwipe) {
             dx = newDx;
             dy = newDy;
+            if (inputDirection) {
+                triggerEdgeFlash(inputDirection);
+            }
             startGame();
             return;
         }
@@ -580,12 +584,18 @@ function setupSwipeControls() {
         // If game is running, set next direction for immediate feedback
         // But only allow one direction change per movement frame to prevent U-turns
         if (gameRunning && isValidSwipe && !directionChangedThisFrame) {
-            nextDx = newDx;
-            nextDy = newDy;
-            pendingDirectionChange = true;
-            directionChangedThisFrame = true;
-            // Trigger immediate re-render to show direction change feedback
-            drawGame();
+            const willChange = (newDx !== dx || newDy !== dy);
+            if (willChange) {
+                nextDx = newDx;
+                nextDy = newDy;
+                pendingDirectionChange = true;
+                directionChangedThisFrame = true;
+                if (inputDirection) {
+                    triggerEdgeFlash(inputDirection);
+                }
+                // Trigger immediate re-render to show direction change feedback
+                drawGame();
+            }
         }
     }
     
@@ -656,6 +666,7 @@ document.addEventListener('keydown', (e) => {
     let newDx = dx;
     let newDy = dy;
     let isDirectionalInput = false;
+    let inputDirection = null;
     
     switch (key) {
         case 'arrowup':
@@ -664,7 +675,7 @@ document.addEventListener('keydown', (e) => {
                 newDx = 0;
                 newDy = -1;
                 isDirectionalInput = true;
-                triggerEdgeFlash('up');
+                inputDirection = 'up';
             }
             break;
         case 'arrowdown':
@@ -673,7 +684,7 @@ document.addEventListener('keydown', (e) => {
                 newDx = 0;
                 newDy = 1;
                 isDirectionalInput = true;
-                triggerEdgeFlash('down');
+                inputDirection = 'down';
             }
             break;
         case 'arrowleft':
@@ -682,7 +693,7 @@ document.addEventListener('keydown', (e) => {
                 newDx = -1;
                 newDy = 0;
                 isDirectionalInput = true;
-                triggerEdgeFlash('left');
+                inputDirection = 'left';
             }
             break;
         case 'arrowright':
@@ -691,7 +702,7 @@ document.addEventListener('keydown', (e) => {
                 newDx = 1;
                 newDy = 0;
                 isDirectionalInput = true;
-                triggerEdgeFlash('right');
+                inputDirection = 'right';
             }
             break;
         case ' ':
@@ -708,6 +719,9 @@ document.addEventListener('keydown', (e) => {
     if (!gameRunning && isDirectionalInput) {
         dx = newDx;
         dy = newDy;
+        if (inputDirection) {
+            triggerEdgeFlash(inputDirection);
+        }
         startGame();
         return;
     }
@@ -720,12 +734,18 @@ document.addEventListener('keydown', (e) => {
     // If game is running, set next direction for immediate feedback
     // But only allow one direction change per movement frame to prevent U-turns
     if (gameRunning && isDirectionalInput && !directionChangedThisFrame) {
-        nextDx = newDx;
-        nextDy = newDy;
-        pendingDirectionChange = true;
-        directionChangedThisFrame = true;
-        // Trigger immediate re-render to show direction change feedback
-        drawGame();
+        const willChange = (newDx !== dx || newDy !== dy);
+        if (willChange) {
+            nextDx = newDx;
+            nextDy = newDy;
+            pendingDirectionChange = true;
+            directionChangedThisFrame = true;
+            if (inputDirection) {
+                triggerEdgeFlash(inputDirection);
+            }
+            // Trigger immediate re-render to show direction change feedback
+            drawGame();
+        }
     }
 });
 
@@ -758,14 +778,24 @@ canvas.addEventListener('touchend', (e) => {
         if (Math.abs(deltaX) > minSwipeDistance) {
             if (deltaX > 0 && dx !== -1) {
                 // Swipe right
-                dx = 1;
-                dy = 0;
-                triggerEdgeFlash('right');
+                const newDx2 = 1;
+                const newDy2 = 0;
+                const willChange2 = (newDx2 !== dx || newDy2 !== dy);
+                if (willChange2) {
+                    dx = newDx2;
+                    dy = newDy2;
+                    triggerEdgeFlash('right');
+                }
             } else if (deltaX < 0 && dx !== 1) {
                 // Swipe left
-                dx = -1;
-                dy = 0;
-                triggerEdgeFlash('left');
+                const newDx2 = -1;
+                const newDy2 = 0;
+                const willChange2 = (newDx2 !== dx || newDy2 !== dy);
+                if (willChange2) {
+                    dx = newDx2;
+                    dy = newDy2;
+                    triggerEdgeFlash('left');
+                }
             }
         }
     } else {
@@ -773,14 +803,24 @@ canvas.addEventListener('touchend', (e) => {
         if (Math.abs(deltaY) > minSwipeDistance) {
             if (deltaY > 0 && dy !== -1) {
                 // Swipe down
-                dx = 0;
-                dy = 1;
-                triggerEdgeFlash('down');
+                const newDx2 = 0;
+                const newDy2 = 1;
+                const willChange2 = (newDx2 !== dx || newDy2 !== dy);
+                if (willChange2) {
+                    dx = newDx2;
+                    dy = newDy2;
+                    triggerEdgeFlash('down');
+                }
             } else if (deltaY < 0 && dy !== 1) {
                 // Swipe up
-                dx = 0;
-                dy = -1;
-                triggerEdgeFlash('up');
+                const newDx2 = 0;
+                const newDy2 = -1;
+                const willChange2 = (newDx2 !== dx || newDy2 !== dy);
+                if (willChange2) {
+                    dx = newDx2;
+                    dy = newDy2;
+                    triggerEdgeFlash('up');
+                }
             }
         }
     }
