@@ -21,16 +21,44 @@ class SnakeGame {
   }
 
   generateRandomFood() {
-    this.food = {
-      x: Math.floor(Math.random() * this.tileCount),
-      y: Math.floor(Math.random() * this.tileCount)
-    };
+    // Try random positions a limited number of times to avoid recursion
+    const maxTries = 50;
+    let placed = false;
+    for (let i = 0; i < maxTries && !placed; i++) {
+      const candidate = {
+        x: Math.floor(Math.random() * this.tileCount),
+        y: Math.floor(Math.random() * this.tileCount)
+      };
+      let onSnake = false;
+      for (let segment of this.snake) {
+        if (segment.x === candidate.x && segment.y === candidate.y) {
+          onSnake = true;
+          break;
+        }
+      }
+      if (!onSnake) {
+        this.food = candidate;
+        placed = true;
+      }
+    }
 
-    // Make sure food doesn't spawn on snake
-    for (let segment of this.snake) {
-      if (segment.x === this.food.x && segment.y === this.food.y) {
-        this.generateRandomFood();
-        return;
+    // Fallback: scan grid to find the first free tile
+    if (!placed) {
+      outer: for (let y = 0; y < this.tileCount; y++) {
+        for (let x = 0; x < this.tileCount; x++) {
+          let occupied = false;
+          for (let segment of this.snake) {
+            if (segment.x === x && segment.y === y) {
+              occupied = true;
+              break;
+            }
+          }
+          if (!occupied) {
+            this.food = { x, y };
+            placed = true;
+            break outer;
+          }
+        }
       }
     }
 
@@ -198,7 +226,11 @@ class Particle {
   }
 }
 
-// Export for testing (Node.js) and browser compatibility
+// Export for testing (Node.js) and browser/global compatibility
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { SnakeGame, Particle };
+}
+if (typeof window !== 'undefined') {
+  window.SnakeGame = SnakeGame;
+  window.Particle = Particle;
 }

@@ -565,37 +565,8 @@ function setupSwipeControls() {
             }
         }
         
-        // If game is not running and we got a valid swipe, start the game
-        if (!gameRunning && isValidSwipe) {
-            dx = newDx;
-            dy = newDy;
-            if (inputDirection) {
-                triggerEdgeFlash(inputDirection);
-            }
-            startGame();
-            return;
-        }
-        
-        // If game is paused, ignore swipes
-        if (gamePaused) {
-            return;
-        }
-        
-        // If game is running, set next direction for immediate feedback
-        // But only allow one direction change per movement frame to prevent U-turns
-        if (gameRunning && isValidSwipe && !directionChangedThisFrame) {
-            const willChange = (newDx !== dx || newDy !== dy);
-            if (willChange) {
-                nextDx = newDx;
-                nextDy = newDy;
-                pendingDirectionChange = true;
-                directionChangedThisFrame = true;
-                if (inputDirection) {
-                    triggerEdgeFlash(inputDirection);
-                }
-                // Trigger immediate re-render to show direction change feedback
-                drawGame();
-            }
+        if (isValidSwipe) {
+            attemptDirectionChange(newDx, newDy, inputDirection);
         }
     }
     
@@ -652,6 +623,42 @@ function setupSwipeControls() {
 
 // Initialize swipe controls when the DOM is loaded
 document.addEventListener('DOMContentLoaded', setupSwipeControls);
+
+// Centralized direction change handler
+function attemptDirectionChange(newDxValue, newDyValue, inputDirection) {
+    // If game is not running and we got a directional input, start the game with this direction
+    if (!gameRunning) {
+        dx = newDxValue;
+        dy = newDyValue;
+        if (inputDirection) {
+            triggerEdgeFlash(inputDirection);
+        }
+        startGame();
+        return;
+    }
+
+    // If game is paused, ignore direction changes
+    if (gamePaused) {
+        return;
+    }
+
+    // If game is running, set next direction for immediate feedback
+    // But only allow one direction change per movement frame to prevent U-turns
+    if (gameRunning && !directionChangedThisFrame) {
+        const willChange = (newDxValue !== dx || newDyValue !== dy);
+        if (willChange) {
+            nextDx = newDxValue;
+            nextDy = newDyValue;
+            pendingDirectionChange = true;
+            directionChangedThisFrame = true;
+            if (inputDirection) {
+                triggerEdgeFlash(inputDirection);
+            }
+            // Trigger immediate re-render to show direction change feedback
+            drawGame();
+        }
+    }
+}
 
 // Keyboard controls
 document.addEventListener('keydown', (e) => {
@@ -715,37 +722,8 @@ document.addEventListener('keydown', (e) => {
             return;
     }
     
-    // If game is not running and we got a directional input, start the game
-    if (!gameRunning && isDirectionalInput) {
-        dx = newDx;
-        dy = newDy;
-        if (inputDirection) {
-            triggerEdgeFlash(inputDirection);
-        }
-        startGame();
-        return;
-    }
-    
-    // If game is paused, only allow space to unpause
-    if (gamePaused) {
-        return;
-    }
-    
-    // If game is running, set next direction for immediate feedback
-    // But only allow one direction change per movement frame to prevent U-turns
-    if (gameRunning && isDirectionalInput && !directionChangedThisFrame) {
-        const willChange = (newDx !== dx || newDy !== dy);
-        if (willChange) {
-            nextDx = newDx;
-            nextDy = newDy;
-            pendingDirectionChange = true;
-            directionChangedThisFrame = true;
-            if (inputDirection) {
-                triggerEdgeFlash(inputDirection);
-            }
-            // Trigger immediate re-render to show direction change feedback
-            drawGame();
-        }
+    if (isDirectionalInput) {
+        attemptDirectionChange(newDx, newDy, inputDirection);
     }
 });
 
@@ -778,24 +756,10 @@ canvas.addEventListener('touchend', (e) => {
         if (Math.abs(deltaX) > minSwipeDistance) {
             if (deltaX > 0 && dx !== -1) {
                 // Swipe right
-                const newDx2 = 1;
-                const newDy2 = 0;
-                const willChange2 = (newDx2 !== dx || newDy2 !== dy);
-                if (willChange2) {
-                    dx = newDx2;
-                    dy = newDy2;
-                    triggerEdgeFlash('right');
-                }
+                attemptDirectionChange(1, 0, 'right');
             } else if (deltaX < 0 && dx !== 1) {
                 // Swipe left
-                const newDx2 = -1;
-                const newDy2 = 0;
-                const willChange2 = (newDx2 !== dx || newDy2 !== dy);
-                if (willChange2) {
-                    dx = newDx2;
-                    dy = newDy2;
-                    triggerEdgeFlash('left');
-                }
+                attemptDirectionChange(-1, 0, 'left');
             }
         }
     } else {
@@ -803,24 +767,10 @@ canvas.addEventListener('touchend', (e) => {
         if (Math.abs(deltaY) > minSwipeDistance) {
             if (deltaY > 0 && dy !== -1) {
                 // Swipe down
-                const newDx2 = 0;
-                const newDy2 = 1;
-                const willChange2 = (newDx2 !== dx || newDy2 !== dy);
-                if (willChange2) {
-                    dx = newDx2;
-                    dy = newDy2;
-                    triggerEdgeFlash('down');
-                }
+                attemptDirectionChange(0, 1, 'down');
             } else if (deltaY < 0 && dy !== 1) {
                 // Swipe up
-                const newDx2 = 0;
-                const newDy2 = -1;
-                const willChange2 = (newDx2 !== dx || newDy2 !== dy);
-                if (willChange2) {
-                    dx = newDx2;
-                    dy = newDy2;
-                    triggerEdgeFlash('up');
-                }
+                attemptDirectionChange(0, -1, 'up');
             }
         }
     }
