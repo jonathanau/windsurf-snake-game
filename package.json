@@ -10,7 +10,7 @@
   },
   "keywords": ["snake", "game", "javascript", "canvas"],
   "author": "",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "devDependencies": {
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0"
