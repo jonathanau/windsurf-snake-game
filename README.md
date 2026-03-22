@@ -1,23 +1,27 @@
 # Snake Game
 
-A classic Snake game implementation built with HTML5 Canvas and JavaScript. Navigate the snake to eat food, grow longer, and achieve the highest score possible!
+A modern twist on the classic Snake game, rebuilt for today's web using HTML5 Canvas and JavaScript. Navigate the snake to eat food, grow longer, and achieve the highest score possible!
 
 ## Features
 
-- **Classic Gameplay**: Control the snake using arrow keys or WASD
+- **Classic Gameplay**: Control the snake using arrow keys, WASD, or swipe gestures
 - **Score Tracking**: Current score and high score display
 - **Modern UI**: Dark theme with neon green styling and glowing effects
-- **Responsive Design**: Centered layout that works on different screen sizes
+- **Mobile-Ready**: Smooth swipe controls for touchscreen devices and responsive layout for any screen size
 - **Game Over Detection**: Collision detection with walls and self
 - **Persistent High Score**: High score is saved locally in your browser
 
 ## Game Controls
 
+**Desktop:**
 - **Arrow Keys** or **WASD**: Move the snake
   - ↑ / W: Move up
   - ↓ / S: Move down
   - ← / A: Move left
   - → / D: Move right
+
+**Mobile / Touchscreen:**
+- **Swipe**: Swipe Up, Down, Left, or Right anywhere on the game board to control the snake's direction.
 
 ## How to Run Locally
 
