@@ -4,7 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self';">
-    <title>Snake Game</title>
+    <title>Snake Game - Classic Free Web Game | Mobile & Touch Friendly</title>
+    <meta name="description" content="Play the classic Snake Game directly in your browser! Enjoy modern graphics, persistent high scores, and smooth swipe controls on mobile. Free to play online.">
+    <!-- Open Graph Tags -->
+    <meta property="og:title" content="Snake Game - Classic Free Web Game">
+    <meta property="og:description" content="Play the classic Snake Game! Enjoy modern graphics and smooth mobile swipe controls.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://thesnakegame.onrender.com/">
+    <meta property="og:image" content="https://thesnakegame.onrender.com/favicon.svg">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Snake Game - Classic Free Web Game">
+    <meta name="twitter:description" content="Play the classic Snake Game! Enjoy modern graphics and smooth mobile swipe controls.">
+    <!-- Canonical -->
+    <link rel="canonical" href="https://thesnakegame.onrender.com/">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <style>
         body {
@@ -109,7 +122,9 @@
             <div class="score">Score: <span id="score">0</span></div>
             <div class="score">Personal Best: <span id="highScore">0</span></div>
         </div>
-        <canvas id="gameCanvas" width="360" height="360"></canvas>
+        <canvas id="gameCanvas" width="360" height="360">
+            Your browser does not support the HTML5 canvas tag. Play the classic Snake game online completely free!
+        </canvas>
         <div class="game-over" id="gameOver">
             Game Over!<br>
             <button onclick="restartGame()">Play Again</button>
