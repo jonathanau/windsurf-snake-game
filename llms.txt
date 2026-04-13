@@ -1,0 +1,33 @@
+# Snake Game
+
+> A free, browser-based Snake game with modern graphics, persistent high scores, and mobile swipe controls. Play instantly at [thesnakegame.onrender.com](https://thesnakegame.onrender.com/).
+
+## About
+
+Snake Game is a modern twist on the classic arcade game, rebuilt for today's web using HTML5 Canvas and vanilla JavaScript. Navigate the snake to eat food, grow longer, and chase your highest score — all directly in your browser with zero downloads or installations.
+
+## Features
+
+- Classic snake gameplay with smooth animations
+- Desktop controls via arrow keys or WASD
+- Mobile and touchscreen support with swipe gestures
+- Persistent high score saved locally in the browser via localStorage
+- Modern dark theme UI with neon green styling and glow effects
+- Responsive layout that adapts to any screen size
+- Collision detection with walls and self
+
+## How to Play
+
+1. Visit [thesnakegame.onrender.com](https://thesnakegame.onrender.com/)
+2. Click "Start Game" or use keyboard/swipe controls
+3. Guide the snake to eat the red food squares to grow and score points
+4. Each food item is worth 10 points
+5. The game ends if the snake hits a wall or itself
+6. Your best score is automatically saved
+
+## Technical Details
+
+- Built with HTML5 Canvas and vanilla JavaScript — no frameworks or dependencies
+- Content Security Policy (CSP) for XSS protection
+- Open source under the Apache License 2.0
+- Works in all modern browsers (Chrome, Firefox, Safari, Edge, Opera)
