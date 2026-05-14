@@ -145,4 +145,4 @@ Feel free to fork this project and submit pull requests for improvements or bug 
 
 ## License
 
-This project is open source and available under the Apache License 2.0. See the `LICENSE` file for details.
+This project is open source and available under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
