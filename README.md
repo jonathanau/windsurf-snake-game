@@ -1,5 +1,7 @@
 # Snake Game
 
+[![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](LICENSE)
+
 A modern twist on the classic Snake game, rebuilt for today's web using HTML5 Canvas and JavaScript. Navigate the snake to eat food, grow longer, and achieve the highest score possible!
 
 ## Features
